@@ -23,6 +23,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.shared.DataFillers;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
@@ -162,8 +163,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     protected void registerPackets() {
-        entityRewriter.register();
-        itemRewriter.register();
+        super.registerPackets();
 
         EntityPackets.register(this);
         WorldPackets.register(this);
@@ -840,16 +840,25 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
     }
 
     @Override
-    protected void onMappingDataLoaded() {
-        ConnectionData.init();
-        RecipeData.init();
-        BlockIdData.init();
-
-        Types1_13.PARTICLE.filler(this)
+    protected void registerDataInitializers(final DataFillers dataFillers) {
+        dataFillers.register(Types1_13.class, this, () -> Types1_13.PARTICLE.filler(MAPPINGS)
                 .reader(3, ParticleType.Readers.BLOCK)
                 .reader(20, ParticleType.Readers.DUST)
                 .reader(11, ParticleType.Readers.DUST)
-                .reader(27, ParticleType.Readers.ITEM1_13);
+                .reader(27, ParticleType.Readers.ITEM1_13));
+    }
+
+    @Override
+    protected void registerIntents(final DataFillers dataFillers) {
+        dataFillers.registerIntent(Types1_13.class);
+    }
+
+    @Override
+    protected void onMappingDataLoaded() {
+        super.onMappingDataLoaded();
+        ConnectionData.init();
+        RecipeData.init();
+        BlockIdData.init();
 
         if (Via.getConfig().isServersideBlockConnections() && Via.getManager().getProviders().get(BlockConnectionProvider.class) instanceof PacketBlockConnectionProvider) {
             BlockConnectionStorage.init();

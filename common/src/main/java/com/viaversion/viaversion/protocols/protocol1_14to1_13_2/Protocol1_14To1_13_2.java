@@ -18,6 +18,8 @@
 package com.viaversion.viaversion.protocols.protocol1_14to1_13_2;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.shared.DataFillers;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
@@ -33,7 +35,6 @@ import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets.Inventor
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets.PlayerPackets;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets.WorldPackets;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
@@ -52,8 +53,7 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     protected void registerPackets() {
-        metadataRewriter.register();
-        itemRewriter.register();
+        super.registerPackets();
 
         EntityPackets.register(this);
         WorldPackets.register(this);
@@ -140,21 +140,31 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
     }
 
     @Override
+    protected void registerDataInitializers(final DataFillers dataFillers) {
+        dataFillers.register(Types1_13_2.class, this, () -> Types1_13_2.PARTICLE.filler(MAPPINGS, false)
+                .reader("block", ParticleType.Readers.BLOCK)
+                .reader("dust", ParticleType.Readers.DUST)
+                .reader("falling_dust", ParticleType.Readers.BLOCK)
+                .reader("item", ParticleType.Readers.ITEM1_13_2));
+        dataFillers.register(Types1_14.class, this, () -> Types1_14.PARTICLE.filler(MAPPINGS)
+                .reader("block", ParticleType.Readers.BLOCK)
+                .reader("dust", ParticleType.Readers.DUST)
+                .reader("falling_dust", ParticleType.Readers.BLOCK)
+                .reader("item", ParticleType.Readers.ITEM1_13_2));
+    }
+
+    @Override
+    protected void registerIntents(final DataFillers dataFillers) {
+        dataFillers.registerIntent(Types1_13_2.class);
+        dataFillers.registerIntent(Types1_14.class);
+    }
+
+    @Override
     protected void onMappingDataLoaded() {
+        super.onMappingDataLoaded();
         WorldPackets.air = MAPPINGS.getBlockStateMappings().getNewId(0);
         WorldPackets.voidAir = MAPPINGS.getBlockStateMappings().getNewId(8591);
         WorldPackets.caveAir = MAPPINGS.getBlockStateMappings().getNewId(8592);
-
-        Types1_13_2.PARTICLE.filler(this, false)
-                .reader("block", ParticleType.Readers.BLOCK)
-                .reader("dust", ParticleType.Readers.DUST)
-                .reader("falling_dust", ParticleType.Readers.BLOCK)
-                .reader("item", ParticleType.Readers.ITEM1_13_2);
-        Types1_14.PARTICLE.filler(this)
-                .reader("block", ParticleType.Readers.BLOCK)
-                .reader("dust", ParticleType.Readers.DUST)
-                .reader("falling_dust", ParticleType.Readers.BLOCK)
-                .reader("item", ParticleType.Readers.ITEM1_13_2);
     }
 
     @Override

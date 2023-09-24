@@ -282,6 +282,13 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
     void initialize();
 
     /**
+     * Returns whether the protocol has been registered and initialized.
+     *
+     * @return whether the protocol has been registered and initialized
+     */
+    boolean isRegistered();
+
+    /**
      * Returns true if this Protocol's {@link #loadMappingData()} method should be called.
      * <p>
      * This does *not* necessarily mean that {@link #getMappingData()} is non-null, since this may be

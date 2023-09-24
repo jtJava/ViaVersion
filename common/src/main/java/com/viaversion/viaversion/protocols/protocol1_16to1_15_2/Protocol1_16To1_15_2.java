@@ -23,6 +23,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.shared.DataFillers;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_16;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
@@ -31,6 +32,7 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
+import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.api.type.types.version.Types1_16;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
@@ -48,7 +50,6 @@ import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.GsonUtil;
 import com.viaversion.viaversion.util.Key;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -212,7 +213,24 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
     }
 
     @Override
+    protected void registerDataInitializers(final DataFillers dataFillers) {
+        dataFillers.register(Types1_16.class, this, () -> Types1_16.PARTICLE.filler(MAPPINGS)
+                .reader("block", ParticleType.Readers.BLOCK)
+                .reader("dust", ParticleType.Readers.DUST)
+                .reader("falling_dust", ParticleType.Readers.BLOCK)
+                .reader("item", ParticleType.Readers.ITEM1_13_2));
+    }
+
+    @Override
+    protected void registerIntents(final DataFillers dataFillers) {
+        dataFillers.registerIntent(Types1_14.class);
+        dataFillers.registerIntent(Types1_16.class);
+    }
+
+    @Override
     protected void onMappingDataLoaded() {
+        super.onMappingDataLoaded();
+
         int[] wallPostOverrideTag = new int[47];
         int arrayIndex = 0;
         wallPostOverrideTag[arrayIndex++] = 140;
@@ -255,12 +273,6 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
         tagRewriter.addEmptyTags(RegistryType.ENTITY, "minecraft:arrows", "minecraft:beehive_inhabitors", "minecraft:raiders", "minecraft:skeletons");
         tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:beds", "minecraft:coals", "minecraft:fences", "minecraft:flowers",
                 "minecraft:lectern_books", "minecraft:music_discs", "minecraft:small_flowers", "minecraft:tall_flowers", "minecraft:trapdoors", "minecraft:walls", "minecraft:wooden_fences");
-
-        Types1_16.PARTICLE.filler(this)
-                .reader("block", ParticleType.Readers.BLOCK)
-                .reader("dust", ParticleType.Readers.DUST)
-                .reader("falling_dust", ParticleType.Readers.BLOCK)
-                .reader("item", ParticleType.Readers.ITEM1_13_2);
     }
 
     @Override

@@ -19,11 +19,13 @@ package com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3;
 
 import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.shared.DataFillers;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
+import com.viaversion.viaversion.api.type.types.version.Types1_19_3;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_4;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ClientboundPackets1_19_3;
@@ -91,10 +93,9 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
     }
 
     @Override
-    protected void onMappingDataLoaded() {
-        super.onMappingDataLoaded();
-        EntityTypes1_19_4.initialize(this);
-        Types1_19_4.PARTICLE.filler(this)
+    protected void registerDataInitializers(final DataFillers dataFillers) {
+        dataFillers.register(EntityTypes1_19_4.class, this, () -> EntityTypes1_19_4.initialize(MAPPINGS));
+        dataFillers.register(Types1_19_4.class, this, () -> Types1_19_4.PARTICLE.filler(MAPPINGS)
                 .reader("block", ParticleType.Readers.BLOCK)
                 .reader("block_marker", ParticleType.Readers.BLOCK)
                 .reader("dust", ParticleType.Readers.DUST)
@@ -103,7 +104,14 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
                 .reader("item", ParticleType.Readers.ITEM1_13_2)
                 .reader("vibration", ParticleType.Readers.VIBRATION1_19)
                 .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
-                .reader("shriek", ParticleType.Readers.SHRIEK);
+                .reader("shriek", ParticleType.Readers.SHRIEK));
+    }
+
+    @Override
+    protected void registerIntents(final DataFillers dataFillers) {
+        dataFillers.registerIntent(Types1_19_3.class);
+        dataFillers.registerIntent(Types1_19_4.class);
+        dataFillers.registerIntent(EntityTypes1_19_4.class);
     }
 
     @Override

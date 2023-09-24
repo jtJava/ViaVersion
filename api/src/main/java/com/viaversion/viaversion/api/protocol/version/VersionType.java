@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,20 +20,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types.version;
+package com.viaversion.viaversion.api.protocol.version;
 
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.minecraft.metadata.types.MetaTypes1_20_2;
-import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.metadata.MetaListType;
-import com.viaversion.viaversion.api.type.types.metadata.MetadataType;
-import com.viaversion.viaversion.api.type.types.misc.ParticleType;
-import java.util.List;
+/**
+ * Categories of Minecraft versions from classic to modern releases, ordered by date.
+ */
+public enum VersionType {
 
-public final class Types1_20_2 {
-
-    public static final ParticleType PARTICLE = new ParticleType(); // Only safe to use after protocol loading
-    public static final MetaTypes1_20_2 META_TYPES = new MetaTypes1_20_2(PARTICLE);
-    public static final Type<Metadata> METADATA = new MetadataType(META_TYPES);
-    public static final Type<List<Metadata>> METADATA_LIST = new MetaListType(METADATA);
+    /**
+     * Classic versions of Minecraft.
+     */
+    CLASSIC,
+    /**
+     * Alpha versions of Minecraft (Alpha 1.0.0 to 1.0.16).
+     */
+    ALPHA_INITIAL,
+    /**
+     * Alpha versions of Minecraft (Alpha 1.0.17 to 1.2.6).
+     */
+    ALPHA_LATER,
+    /**
+     * Beta versions of Minecraft (Beta 1.0 to 1.1_02).
+     */
+    BETA_INITIAL,
+    /**
+     * Beta versions of Minecraft (Beta 1.2 to 1.9-pre6/1.0.0-RC2).
+     */
+    BETA_LATER,
+    /**
+     * Pre-netty release versions of Minecraft (1.0.0 to the 1.7.2 snapshot 13w39b).
+     */
+    RELEASE_INITIAL,
+    /**
+     * Modern release versions of Minecraft (13w41a to latest).
+     */
+    RELEASE,
+    /**
+     * Any version that doesn't fit in the above categories (e.g. April Fools).
+     * <p>
+     * Protocol versions using this type must override the compareTo method.
+     */
+    SPECIAL
 }
